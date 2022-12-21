@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#Configure your Nginx server so that /redirect_me is redirecting to another page.
+#The redirection must be a “301 Moved Permanently”
+STRING="Hello World!"
+REDIRECT="\n\tlocation /redirect_me {\n\t\treturn 301 https://www.youtube.com/watch?v=qM1TFj_I8NU; \n\t}\n"
+FILE="/etc/nginx/sites-enabled/default"
+FILEERROR="/var/www/html/404.html"
+ERRORREDIRECT="\n\terror_page 404 /404.html;\n\tlocation = /404.html {\n\t\troot /var/www/html;\n\t\tinternal;\n\t}\n"
+sudo apt-get -y update
+sudo apt-get -y install nginx
+sudo ufw allow 'Nginx HTTP'
+echo "$STRING" > /var/www/html/index.nginx-debian.html
+sudo sed -i "30i\ $REDIRECT" "$FILE"
+
+echo "Ceci n'est pas une page" > "$FILEERROR"
+sudo sed -i "30i\ $ERRORREDIRECT" "$FILE"
+
+sudo service nginx restart
